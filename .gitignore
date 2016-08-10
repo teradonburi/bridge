@@ -1,0 +1,10 @@
+build/
+db/
+doc/
+report/
+client/browser/
+client/bridge-darwin-x64
+client/bridge-win32-x64
+client/android/app/src/main/assets
+client/ios/bridge/html
+
