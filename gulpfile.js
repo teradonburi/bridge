@@ -44,6 +44,7 @@ gulp.task('init',['server','copy'], function() {
     stream = gulp.src('./')
         .pipe(webserver({
         livereload: {
+            host: '0.0.0.0',
             enable: true, 
             filter: function(fileName) {    
                 if (fileName.match(/doc$/) || fileName.match(/report/) || fileName.match(/client/) || fileName.match(/db/)) { 
