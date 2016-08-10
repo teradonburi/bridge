@@ -1,0 +1,17 @@
+{
+    "save":[{
+        "tableName":"books", 
+        "datas":{"code": "B001", "title": "Phantoms in the brain", "author": "Ramachandran", "year": 1999, "copies": 10}
+    },
+    {
+        "tableName":"books", 
+        "key":{"objectId":"7dd9245f-a794-45cd-9b3e-8621c0d31b79"},
+        "datas":{"code": "B002", "title": "The tell-tale brain", "author": "Ramachandran", "year": 2011, "copies": 10,"objectId":"7dd9245f-a794-45cd-9b3e-8621c0d31b79"}
+    }],
+    "select":[{
+        "tableName":"books"
+    }],
+    "drop":[{
+        "tableName":"books"
+    }]
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Browser Sample</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <script type="text/javascript" src="build/common.js"></script>
+    <script type="text/javascript" src="bower_components/localStorageDB/localstoragedb.min.js"></script>
+    <script type="text/javascript" src="bower_components/socket.io.client/dist/socket.io-1.3.5.js"></script>
+
+    <script type="text/javascript">
+        
+        // electron
+        if(typeof process !== "undefined"){
+            if(process.type === 'renderer'){
+                require('electron-connect').client.create();
+            }
+        }
+
+        // 共通ライブラリ読み込み
+        var lib = require('index.js');
+
+        // オンラインの判定
+        var isOnline = navigator.onLine;
+
+        // WebSocket
+        var socket = null;
+
+        // ユーザ（自分）
+        var user = null;
+        
+        
+        function websocket(syncLocal){
+            var socket = io.connect(lib.socketURL);           
+            socket.on('connect', function(){
+                console.log("socket connect:",socket.id);
+                // 受信
+                socket.on('event', function(data){
+                    syncLocal(data);
+                   
+                });
+            });
+
+            socket.on('reconnect', function(){
+                console.log("socket reconnect");
+            });
+
+            socket.on('disconnect', function(){
+                console.log("socket disconnect");
+            });
+            
+            socket.on('connect_failed',function() {
+                console.log('Connection Failed');
+            });
+            return socket;
+        }
+        if(isOnline && lib.isNeedSync){
+            socket = websocket(syncLocal);
+        }
+        
+        // サーバ同期処理
+        function sync(param,callback){
+
+            var tableName = param.tableName;
+
+            // 自分のデータ送信
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", lib.serverURL+'/save', true);
+            xhr.onload = function (e) {
+                if (e.currentTarget.readyState === 4) {
+                    if (e.currentTarget.status === 200) {
+                        var result = JSON.parse(e.currentTarget.responseText);
+                        if(result.code !== lib.code.Success.code){
+
+                            // サーバエラー
+                            callback(null,JSON.parse(e.currentTarget.responseText));
+                            return;
+                        }
+
+                        var param = {"tableName":tableName};
+                        // 他のユーザのデータ取得
+                        xhr.open("POST", lib.serverURL+'/select', true);
+                        xhr.onload = function (e) {
+                            if (e.currentTarget.readyState === 4) {
+                                if (e.currentTarget.status === 200) {
+                                    callback(null,JSON.parse(e.currentTarget.responseText));                                
+                                } else {
+                                    callback(e.currentTarget.statusText,null);
+                                }
+                            }
+                        };                        
+                        xhr.setRequestHeader( 'Content-Type', 'application/json;charset=UTF-8' );
+                        xhr.send( JSON.stringify( param ));
+
+
+                    } else {
+                        callback(e.currentTarget.statusText,null);
+                    }
+                }
+            };
+            xhr.onerror = function (e) {
+                callback("server connection error",null);
+            };
+            xhr.setRequestHeader( 'Content-Type', 'application/json;charset=UTF-8' );
+            xhr.send( JSON.stringify( param ));
+
+        }
+        
+        // 同期結果
+        function syncResponse(err,result){
+            if(err){
+                // サーバエラー
+                return;
+            }
+            else if(result.code !== lib.code.Success.code){
+                // サーバエラー
+                return;
+            }
+            
+            lib.drop({tableName:"User"});
+
+            // ローカル保存
+            for(var i=0;i<result.data.length;++i){
+                lib.save({
+                    tableName:"User", 
+                    key:{"objectId":result.data[i].objectId},
+                    datas:result.data[i]
+                });    
+            }
+
+            printUsers();
+        }
+        
+        // ローカル同期
+        function syncLocal(data){
+            var myId = localStorage.getItem('myId');
+            if(data.objectId != myId){
+                ///////// 自分以外のデータ受信時同期 ////////////
+                lib.save({
+                    tableName:"User", 
+                    key:{"objectId":data.objectId},
+                    datas:data
+                });   
+                printUsers();
+
+            }
+        }
+        
+
+        // オンラインになったときに呼ばれるイベント
+        window.addEventListener("online", function(e) {
+            isOnline = navigator.onLine;
+            
+            
+            ///////// オンライン時、サーバに同期 ////////////
+            if(lib.isNeedSync){
+                if(socket === null){
+                    socket = websocket(syncLocal);
+                }else{
+                    socket.connect();
+                }
+
+                var myId = localStorage.getItem('myId');
+                sync({tableName:"User",key:{"objectId":myId},datas:user.data[0]},syncResponse);
+            }
+        }, false);
+
+        // オフラインになったときに呼ばれるイベント
+        window.addEventListener("offline", function(e) {
+            isOnline = navigator.onLine;
+            
+            if(socket !== null){
+                socket.disconnect();
+            }
+        }, false);
+        
+        
+        function getUser(){
+            
+            ///////// ローカルの処理 /////////
+            if( localStorage.getItem('myId') != void 0){
+                var myId = localStorage.getItem('myId');
+                // Idから自分のユーザ情報取得
+                user = lib.select({
+                    tableName:"User", 
+                    condition:"$.objectId == '" + myId +"'"
+                });
+                
+            }else{
+                // ユーザ作成
+                user = lib.save({
+                    "tableName":"User", 
+                    "datas":{"username": "test", "password": "abcdef"}
+                });                
+                localStorage.setItem('myId', user.data[0].objectId);
+                var myId = localStorage.getItem('myId');
+
+            }
+            
+            printUsers();
+            
+            ///////// オンライン時、サーバに同期 ////////////
+            if(isOnline && lib.isNeedSync){
+                sync({tableName:"User",key:{"objectId":myId},datas:user.data[0]},syncResponse);
+            }
+        }
+        
+        
+        function printUsers(){
+            var div = document.querySelector("#result");
+            
+            var users = lib.select({
+                "tableName":"User"
+            });            
+            
+            div.innerHTML = JSON.stringify(users);
+            
+            printUser();
+        }
+        
+        function printUser(){
+            var div = document.querySelector("#self");
+            div.innerHTML = JSON.stringify(user);
+        }
+        
+        function nativeCall(){
+            // ネイティブに通知する
+            //jsInterface.setHoge(val);
+        }
+        
+       
+        window.onload = function (e) {
+            
+            getUser();            
+
+        };
+        
+        
+    </script>
+</head>
+
+<body>
+    <!-- tag -->
+    <div id="result"></div>
+    <div id="self" style="color:red;"></div>
+</body>
+
+</html>

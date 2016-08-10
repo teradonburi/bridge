@@ -1,0 +1,21 @@
+{
+  "name": "digitocr",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Daiki Terai <daiki.terai@g.softbank.co.jp>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/teradonburi/bridge",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "localStorageDB": "localstoragedb#^2.3.1",
+    "socket.io.client": "^1.3.5"
+  }
+}
