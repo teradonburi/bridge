@@ -21,8 +21,12 @@ function unittest(name){
 
     it(name,function(){
         console.log("\ntest name:",name);
-        for(var i=0;i<testJson[name].length;++i){
-            expect(obj[name](testJson[name][i]).code).toEqual(obj.code.Success.code);
+        if(testJson[name] !== void 0){
+            for(var i=0;i<testJson[name].length;++i){
+                expect(obj[name](testJson[name][i]).code).toEqual(obj.code.Success.code);
+            }
+        }else{
+            console.log("test data is not found,this test skip.");
         }
         
     });

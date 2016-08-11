@@ -224,10 +224,12 @@
             div.innerHTML = JSON.stringify(user);
         }
         
-        function nativeCall(){
-            // ネイティブに通知する
-            //jsInterface.setHoge(val);
+        // Android用Bridge
+        function androidBridge(param){
+            var ret = JSON.stringify(eval(param));
+            Android.callback(ret);
         }
+        
         
        
         window.onload = function (e) {

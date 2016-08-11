@@ -189,7 +189,7 @@ gulp.task('default',['init','unittest','doc','plato'], function () {
     gulp.watch(['./app.js'], ['server']);
     // BrowserProcess(MainProcess)が読み込むリソースが変更されたら, Electron自体を再起動
     gulp.watch(['./main.js'],electron.restart);
-    gulp.watch(['./index.html'], electron.reload);
+    gulp.watch(['./index.html'], ['electron-reload']);// TODO:二回リロードされてる
     gulp.watch(['./libs/**/*.js'], ['server','unittest','electron-reload','doc','plato']);
     gulp.watch(['./spec/*.js','./spec/*.json'], ['unittest']);
 }); 

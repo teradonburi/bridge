@@ -50,6 +50,12 @@ var obj ={
         DBError:{code:-3,msg:'DB Error'}
     },
     
+    test:function(param){
+        var result = this.code.Success;
+        result.data = param;
+        return result;
+    },
+    
     
     /**
     * ストレージ
