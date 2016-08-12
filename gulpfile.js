@@ -59,7 +59,7 @@ gulp.task('init',['server','copy'], function() {
 });
 
 // electro-livereload
-gulp.task('electron-reload',['copy'], function() {
+gulp.task('electron-reload',['copy','copy_html'], function() {
 
     //stream.reload();
     // RendererProcessが読み込むリソースが変更されたら, RendererProcessにreloadさせる
@@ -117,11 +117,20 @@ gulp.task('browserify', function() {
 // copy
 gulp.task('copy',['browserify'], function() {
 
-    return gulp.src([ 'index.html', 'bower_components/**', 'build/**' ],
+    return gulp.src([ 'bower_components/**', 'build/**' ],
                     { base: './' })
                 .pipe( gulp.dest( 'client/browser' ) )
                 .pipe( gulp.dest('client/android/app/src/main/assets' ))
                 .pipe( gulp.dest('client/ios/bridge/html' ));
+});
+
+gulp.task('copy_html', function() {
+
+    return gulp.src([ 'index.html' ],
+                    { base: './' })
+        .pipe( gulp.dest( 'client/browser' ) )
+        .pipe( gulp.dest('client/android/app/src/main/assets' ))
+        .pipe( gulp.dest('client/ios/bridge/html' ));
 });
 
 // electron package
@@ -189,7 +198,7 @@ gulp.task('default',['init','unittest','doc','plato'], function () {
     gulp.watch(['./app.js'], ['server']);
     // BrowserProcess(MainProcess)が読み込むリソースが変更されたら, Electron自体を再起動
     gulp.watch(['./main.js'],electron.restart);
-    gulp.watch(['./index.html'], ['electron-reload']);// TODO:二回リロードされてる
+    gulp.watch(['./index.html'],['copy_html'], electron.reload);
     gulp.watch(['./libs/**/*.js'], ['server','unittest','electron-reload','doc','plato']);
     gulp.watch(['./spec/*.js','./spec/*.json'], ['unittest']);
 }); 

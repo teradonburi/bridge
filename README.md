@@ -1,10 +1,12 @@
 # JavascriptでWrite once,run anywhere
+Qiita:[JSでWrite once,run anywhere](http://qiita.com/teradonburi/items/a49967c9e67cbcced6f2)
+
 下記環境で動作
 
 * NodeJS(Rest API)       
-* Browser(Chrome)  
-* Native Bridge(iOS,Android)
-* Desktop Native(Windows,OSX)
+* ブラウザ 
+* スマホネイティブ(iOS,Android)
+* デスクトップアプリ(Windows,OSX)
 
 # インストール
 ターミナルにてnpmモジュールインストール(nvmインストール前提)
