@@ -9,7 +9,7 @@ Qiita:[JSでWrite once,run anywhere](http://qiita.com/teradonburi/items/a49967c9
 * デスクトップアプリ(Windows,OSX)
 
 # インストール
-ターミナルにてnpmモジュールインストール(nvmインストール前提)
+ターミナルにてnpmモジュールインストール(nvmインストール前提)  
 Nodeのバージョンは4.3.2
 
 ```
