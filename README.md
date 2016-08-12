@@ -10,6 +10,7 @@ Qiita:[JSでWrite once,run anywhere](http://qiita.com/teradonburi/items/a49967c9
 
 # インストール
 ターミナルにてnpmモジュールインストール(nvmインストール前提)
+Nodeのバージョンは4.3.2
 
 ```
 $git clone http://code-dev.ark.pssol.jp/beauty_engine/menstruationSDK.git
@@ -39,6 +40,9 @@ libs/common/index.js
 
 返却データはRest APIと共通化するため、次のようなルールにします。
 
+```
+{code:レスポンスコード,msg:'エラーメッセージなど',data:返却データ}
+```
 
 # 単体テスト
 gulp起動時にjasmine-nodeでspecフォルダ以下の単体テストを実行します。  
