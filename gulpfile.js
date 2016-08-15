@@ -47,7 +47,11 @@ gulp.task('init',['server','copy'], function() {
             host: '0.0.0.0',
             enable: true, 
             filter: function(fileName) {    
-                if (fileName.match(/doc$/) || fileName.match(/report/) || fileName.match(/client/) || fileName.match(/db/)) { 
+                if (fileName.match(/doc/) || 
+                    fileName.match(/report/) ||
+                    fileName.match(/client/) || 
+                    fileName.match(/libs/) || 
+                    fileName.match(/db/)) { 
                     return false;
                 } else {
                     return true;
